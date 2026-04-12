@@ -51,7 +51,11 @@ const HistoryPage = () => {
           )}
         </div>
 
-        {entries.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : entries.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-12 text-center">
             <Clock className="size-12 text-muted-foreground/40 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No scans yet</h3>
