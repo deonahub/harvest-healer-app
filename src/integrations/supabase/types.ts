@@ -44,6 +44,51 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_history: {
+        Row: {
+          area_affected: number
+          confidence: number
+          created_at: string
+          damage_type: string
+          description: string
+          environment_data: Json | null
+          file_name: string | null
+          id: string
+          recommendations: string[]
+          severity: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          area_affected: number
+          confidence: number
+          created_at?: string
+          damage_type: string
+          description: string
+          environment_data?: Json | null
+          file_name?: string | null
+          id?: string
+          recommendations: string[]
+          severity: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          area_affected?: number
+          confidence?: number
+          created_at?: string
+          damage_type?: string
+          description?: string
+          environment_data?: Json | null
+          file_name?: string | null
+          id?: string
+          recommendations?: string[]
+          severity?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
