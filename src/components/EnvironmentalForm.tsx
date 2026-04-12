@@ -28,7 +28,7 @@ const EnvironmentalForm = () => {
     await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
     const analysisResult = simulateEnvironmentalAnalysis(form);
     setResult(analysisResult);
-    addHistory({ source: "environment", environmentData: form, result: analysisResult });
+    await addHistory({ source: "environment", environmentData: form, result: analysisResult });
     setIsAnalyzing(false);
   };
 

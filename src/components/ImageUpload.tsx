@@ -39,9 +39,7 @@ const ImageUpload = () => {
     await new Promise((r) => setTimeout(r, 2000 + Math.random() * 1000));
     const analysisResult = simulateImageAnalysis();
     setResult(analysisResult);
-    // Create a small thumbnail for history
-    const thumbnail = preview && preview.length < 200000 ? preview : undefined;
-    addHistory({ source: "image", fileName, thumbnail, result: analysisResult });
+    await addHistory({ source: "image", fileName, result: analysisResult });
     setIsAnalyzing(false);
   };
 

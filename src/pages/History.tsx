@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Trash2, Clock, Camera, Leaf, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Trash2, Clock, Camera, Leaf, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getHistory, clearHistory, type HistoryEntry } from "@/lib/history";
 import ResultCard from "@/components/ResultCard";
@@ -8,11 +8,19 @@ import { damageLabels, severityColors } from "@/lib/analysis";
 import Navbar from "@/components/Navbar";
 
 const HistoryPage = () => {
-  const [entries, setEntries] = useState<HistoryEntry[]>(getHistory());
+  const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleClear = () => {
-    clearHistory();
+  useEffect(() => {
+    getHistory().then((data) => {
+      setEntries(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleClear = async () => {
+    await clearHistory();
     setEntries([]);
   };
 
@@ -43,7 +51,11 @@ const HistoryPage = () => {
           )}
         </div>
 
-        {entries.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : entries.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-12 text-center">
             <Clock className="size-12 text-muted-foreground/40 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No scans yet</h3>
@@ -63,13 +75,9 @@ const HistoryPage = () => {
                     onClick={() => setExpandedId(isExpanded ? null : entry.id)}
                     className="w-full px-5 py-4 flex items-center gap-4 hover:bg-muted/30 transition-colors text-left"
                   >
-                    {entry.thumbnail ? (
-                      <img src={entry.thumbnail} alt="" className="size-12 rounded-lg object-cover shrink-0" />
-                    ) : (
-                      <div className="size-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                        {entry.source === "image" ? <Camera className="size-5 text-muted-foreground" /> : <Leaf className="size-5 text-muted-foreground" />}
-                      </div>
-                    )}
+                    <div className="size-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      {entry.source === "image" ? <Camera className="size-5 text-muted-foreground" /> : <Leaf className="size-5 text-muted-foreground" />}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-sm truncate">{damageLabels[entry.result.damageType]}</span>
