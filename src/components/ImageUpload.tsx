@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { Upload, Image, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { simulateImageAnalysis, type AnalysisResult } from "@/lib/analysis";
+import { addHistory } from "@/lib/history";
 import ResultCard from "./ResultCard";
 
 const ImageUpload = () => {
@@ -36,7 +37,11 @@ const ImageUpload = () => {
   const analyze = async () => {
     setIsAnalyzing(true);
     await new Promise((r) => setTimeout(r, 2000 + Math.random() * 1000));
-    setResult(simulateImageAnalysis());
+    const analysisResult = simulateImageAnalysis();
+    setResult(analysisResult);
+    // Create a small thumbnail for history
+    const thumbnail = preview && preview.length < 200000 ? preview : undefined;
+    addHistory({ source: "image", fileName, thumbnail, result: analysisResult });
     setIsAnalyzing(false);
   };
 

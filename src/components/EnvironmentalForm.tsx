@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Leaf, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { simulateEnvironmentalAnalysis, type AnalysisResult } from "@/lib/analysis";
+import { addHistory } from "@/lib/history";
 import ResultCard from "./ResultCard";
 
 const EnvironmentalForm = () => {
@@ -25,7 +26,9 @@ const EnvironmentalForm = () => {
   const analyze = async () => {
     setIsAnalyzing(true);
     await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
-    setResult(simulateEnvironmentalAnalysis(form));
+    const analysisResult = simulateEnvironmentalAnalysis(form);
+    setResult(analysisResult);
+    addHistory({ source: "environment", environmentData: form, result: analysisResult });
     setIsAnalyzing(false);
   };
 
