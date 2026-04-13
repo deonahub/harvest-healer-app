@@ -1,8 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Upload, Image, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { simulateImageAnalysis, type AnalysisResult } from "@/lib/analysis";
+import { type AnalysisResult } from "@/lib/analysis";
 import { addHistory } from "@/lib/history";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import ResultCard from "./ResultCard";
 
 const ImageUpload = () => {
@@ -10,15 +12,59 @@ const ImageUpload = () => {
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const analyzeImage = useCallback(async (base64: string, name: string) => {
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-crop", {
+        body: { imageBase64: base64 },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Analysis failed");
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      const analysisResult = data as AnalysisResult;
+      setResult(analysisResult);
+      await addHistory({ source: "image", fileName: name, result: analysisResult });
+
+      toast({
+        title: "Analysis Complete",
+        description: `Detected: ${analysisResult.damageType === "safe" ? "Healthy crops" : analysisResult.description}`,
+      });
+    } catch (err: any) {
+      console.error("Analysis error:", err);
+      toast({
+        title: "Analysis Failed",
+        description: err.message || "Could not analyze image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  }, []);
 
   const handleFile = useCallback((file: File) => {
-    if (!file.type.startsWith("image/")) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please upload an image file (JPG, PNG).", variant: "destructive" });
+      return;
+    }
     setFileName(file.name);
     setResult(null);
     const reader = new FileReader();
-    reader.onload = (e) => setPreview(e.target?.result as string);
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      setPreview(base64);
+      // Auto-trigger analysis after upload
+      analyzeImage(base64, file.name);
+    };
     reader.readAsDataURL(file);
-  }, []);
+  }, [analyzeImage]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -34,19 +80,15 @@ const ImageUpload = () => {
     if (file) handleFile(file);
   };
 
-  const analyze = async () => {
-    setIsAnalyzing(true);
-    await new Promise((r) => setTimeout(r, 2000 + Math.random() * 1000));
-    const analysisResult = simulateImageAnalysis();
-    setResult(analysisResult);
-    await addHistory({ source: "image", fileName, result: analysisResult });
-    setIsAnalyzing(false);
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
   };
 
   const clear = () => {
     setPreview(null);
     setFileName("");
     setResult(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
@@ -61,9 +103,10 @@ const ImageUpload = () => {
       <div className="max-w-2xl mx-auto">
         <div className="bg-card rounded-2xl p-3 border border-border shadow-sm">
           {!preview ? (
-            <label
+            <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
+              onClick={openFilePicker}
               className="border-2 border-dashed border-border rounded-xl p-10 sm:p-16 flex flex-col items-center gap-6 cursor-pointer hover:bg-muted/50 transition-colors min-h-[320px] justify-center"
             >
               <div className="size-20 rounded-full bg-muted flex items-center justify-center">
@@ -73,34 +116,43 @@ const ImageUpload = () => {
                 <p className="text-xl font-semibold mb-1">Upload Crop Image</p>
                 <p className="text-muted-foreground text-sm">JPG, PNG, JPEG — drag & drop or tap to select</p>
               </div>
-              <Button variant="hero" size="lg" className="w-full max-w-xs h-14 rounded-xl" type="button">
+              <Button variant="hero" size="lg" className="w-full max-w-xs h-14 rounded-xl" type="button" onClick={(e) => { e.stopPropagation(); openFilePicker(); }}>
                 Select Photo
               </Button>
-              <input type="file" accept="image/*" onChange={handleChange} className="hidden" />
-            </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                onChange={handleChange}
+                className="hidden"
+              />
+            </div>
           ) : (
             <div className="flex flex-col gap-4">
               <div className="relative rounded-xl overflow-hidden aspect-video bg-muted">
                 <img src={preview} alt="Uploaded crop" className="w-full h-full object-cover" />
-                <button onClick={clear} className="absolute top-3 right-3 size-8 rounded-full bg-foreground/70 flex items-center justify-center hover:bg-foreground/90 transition-colors">
-                  <X className="size-4 text-background" />
-                </button>
+                {isAnalyzing && (
+                  <div className="absolute inset-0 bg-background/60 flex flex-col items-center justify-center gap-3">
+                    <Loader2 className="size-10 animate-spin text-primary" />
+                    <p className="text-lg font-semibold">Analyzing your crop...</p>
+                  </div>
+                )}
+                {!isAnalyzing && (
+                  <button onClick={clear} className="absolute top-3 right-3 size-8 rounded-full bg-foreground/70 flex items-center justify-center hover:bg-foreground/90 transition-colors">
+                    <X className="size-4 text-background" />
+                  </button>
+                )}
               </div>
               <div className="flex items-center justify-between px-2">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Image className="size-4" />
                   <span className="truncate max-w-[200px]">{fileName}</span>
                 </div>
-                <Button variant="hero" size="lg" className="h-14 px-10 rounded-xl" onClick={analyze} disabled={isAnalyzing}>
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="size-5 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    "Analyze Image"
-                  )}
-                </Button>
+                {!isAnalyzing && result && (
+                  <Button variant="hero" size="lg" className="h-14 px-10 rounded-xl" onClick={() => analyzeImage(preview, fileName)}>
+                    Re-Analyze
+                  </Button>
+                )}
               </div>
             </div>
           )}
