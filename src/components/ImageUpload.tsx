@@ -5,6 +5,7 @@ import { type AnalysisResult } from "@/lib/analysis";
 import { addHistory } from "@/lib/history";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ResultCard from "./ResultCard";
 
 const ImageUpload = () => {
@@ -13,6 +14,7 @@ const ImageUpload = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   const analyzeImage = useCallback(async (base64: string, name: string) => {
     setIsAnalyzing(true);
@@ -21,37 +23,32 @@ const ImageUpload = () => {
         body: { imageBase64: base64 },
       });
 
-      if (error) {
-        throw new Error(error.message || "Analysis failed");
-      }
-
-      if (data?.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw new Error(error.message || "Analysis failed");
+      if (data?.error) throw new Error(data.error);
 
       const analysisResult = data as AnalysisResult;
       setResult(analysisResult);
       await addHistory({ source: "image", fileName: name, result: analysisResult });
 
       toast({
-        title: "Analysis Complete",
-        description: `Detected: ${analysisResult.damageType === "safe" ? "Healthy crops" : analysisResult.description}`,
+        title: t("upload.complete"),
+        description: analysisResult.damageType === "safe" ? t("upload.healthyCrops") : analysisResult.description,
       });
     } catch (err: any) {
       console.error("Analysis error:", err);
       toast({
-        title: "Analysis Failed",
+        title: t("upload.failed"),
         description: err.message || "Could not analyze image. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsAnalyzing(false);
     }
-  }, []);
+  }, [t]);
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
-      toast({ title: "Invalid file", description: "Please upload an image file (JPG, PNG).", variant: "destructive" });
+      toast({ title: t("upload.invalidFile"), description: t("upload.invalidFileDesc"), variant: "destructive" });
       return;
     }
     setFileName(file.name);
@@ -60,29 +57,23 @@ const ImageUpload = () => {
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
       setPreview(base64);
-      // Auto-trigger analysis after upload
       analyzeImage(base64, file.name);
     };
     reader.readAsDataURL(file);
-  }, [analyzeImage]);
+  }, [analyzeImage, t]);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if (file) handleFile(file);
-    },
-    [handleFile]
-  );
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }, [handleFile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFile(file);
   };
 
-  const openFilePicker = () => {
-    fileInputRef.current?.click();
-  };
+  const openFilePicker = () => fileInputRef.current?.click();
 
   const clear = () => {
     setPreview(null);
@@ -94,10 +85,8 @@ const ImageUpload = () => {
   return (
     <section id="upload" className="max-w-7xl mx-auto px-4 sm:px-8 py-16">
       <div className="text-center mb-10">
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">Image Analysis</h2>
-        <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-          Upload a clear photo of your crop to detect damage, estimate severity, and get recovery recommendations.
-        </p>
+        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">{t("upload.heading")}</h2>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto">{t("upload.subheading")}</p>
       </div>
 
       <div className="max-w-2xl mx-auto">
@@ -113,19 +102,13 @@ const ImageUpload = () => {
                 <Upload className="size-8 text-muted-foreground" />
               </div>
               <div className="text-center">
-                <p className="text-xl font-semibold mb-1">Upload Crop Image</p>
-                <p className="text-muted-foreground text-sm">JPG, PNG, JPEG — drag & drop or tap to select</p>
+                <p className="text-xl font-semibold mb-1">{t("upload.dropzone")}</p>
+                <p className="text-muted-foreground text-sm">{t("upload.formats")}</p>
               </div>
               <Button variant="hero" size="lg" className="w-full max-w-xs h-14 rounded-xl" type="button" onClick={(e) => { e.stopPropagation(); openFilePicker(); }}>
-                Select Photo
+                {t("upload.selectBtn")}
               </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/jpg"
-                onChange={handleChange}
-                className="hidden"
-              />
+              <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/jpg" onChange={handleChange} className="hidden" />
             </div>
           ) : (
             <div className="flex flex-col gap-4">
@@ -134,7 +117,7 @@ const ImageUpload = () => {
                 {isAnalyzing && (
                   <div className="absolute inset-0 bg-background/60 flex flex-col items-center justify-center gap-3">
                     <Loader2 className="size-10 animate-spin text-primary" />
-                    <p className="text-lg font-semibold">Analyzing your crop...</p>
+                    <p className="text-lg font-semibold">{t("upload.analyzing")}</p>
                   </div>
                 )}
                 {!isAnalyzing && (
@@ -150,7 +133,7 @@ const ImageUpload = () => {
                 </div>
                 {!isAnalyzing && result && (
                   <Button variant="hero" size="lg" className="h-14 px-10 rounded-xl" onClick={() => analyzeImage(preview, fileName)}>
-                    Re-Analyze
+                    {t("upload.reAnalyze")}
                   </Button>
                 )}
               </div>
