@@ -6,7 +6,11 @@ import { addHistory } from "@/lib/history";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ResultCard from "./ResultCard";
 
-const EnvironmentalForm = () => {
+interface EnvironmentalFormProps {
+  onResultText?: (text: string) => void;
+}
+
+const EnvironmentalForm = ({ onResultText }: EnvironmentalFormProps) => {
   const [form, setForm] = useState({ cropType: "", rainfall: "", windExposure: "", soilCondition: "", fieldSize: "" });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -20,6 +24,8 @@ const EnvironmentalForm = () => {
     await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
     const analysisResult = simulateEnvironmentalAnalysis(form);
     setResult(analysisResult);
+    const summaryText = `${analysisResult.damageType}: ${analysisResult.description}. ${analysisResult.recommendations.join(". ")}`;
+    onResultText?.(summaryText);
     await addHistory({ source: "environment", environmentData: form, result: analysisResult });
     setIsAnalyzing(false);
   };

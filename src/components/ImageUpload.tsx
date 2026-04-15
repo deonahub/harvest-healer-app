@@ -8,7 +8,11 @@ import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ResultCard from "./ResultCard";
 
-const ImageUpload = () => {
+interface ImageUploadProps {
+  onResultText?: (text: string) => void;
+}
+
+const ImageUpload = ({ onResultText }: ImageUploadProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -28,6 +32,8 @@ const ImageUpload = () => {
 
       const analysisResult = data as AnalysisResult;
       setResult(analysisResult);
+      const summaryText = `${analysisResult.damageType}: ${analysisResult.description}. ${analysisResult.recommendations.join(". ")}`;
+      onResultText?.(summaryText);
       await addHistory({ source: "image", fileName: name, result: analysisResult });
 
       toast({
@@ -44,7 +50,7 @@ const ImageUpload = () => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [t]);
+  }, [t, onResultText]);
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
