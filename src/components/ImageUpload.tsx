@@ -8,7 +8,11 @@ import { toast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ResultCard from "./ResultCard";
 
-const ImageUpload = () => {
+interface ImageUploadProps {
+  onResultText?: (text: string) => void;
+}
+
+const ImageUpload = ({ onResultText }: ImageUploadProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);

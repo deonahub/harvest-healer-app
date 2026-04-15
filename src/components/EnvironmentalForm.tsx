@@ -6,7 +6,11 @@ import { addHistory } from "@/lib/history";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ResultCard from "./ResultCard";
 
-const EnvironmentalForm = () => {
+interface EnvironmentalFormProps {
+  onResultText?: (text: string) => void;
+}
+
+const EnvironmentalForm = ({ onResultText }: EnvironmentalFormProps) => {
   const [form, setForm] = useState({ cropType: "", rainfall: "", windExposure: "", soilCondition: "", fieldSize: "" });
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
