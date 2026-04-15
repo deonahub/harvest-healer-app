@@ -32,6 +32,8 @@ const ImageUpload = ({ onResultText }: ImageUploadProps) => {
 
       const analysisResult = data as AnalysisResult;
       setResult(analysisResult);
+      const summaryText = `${analysisResult.damageType}: ${analysisResult.description}. ${analysisResult.recommendations.join(". ")}`;
+      onResultText?.(summaryText);
       await addHistory({ source: "image", fileName: name, result: analysisResult });
 
       toast({

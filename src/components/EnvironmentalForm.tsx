@@ -24,6 +24,8 @@ const EnvironmentalForm = ({ onResultText }: EnvironmentalFormProps) => {
     await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
     const analysisResult = simulateEnvironmentalAnalysis(form);
     setResult(analysisResult);
+    const summaryText = `${analysisResult.damageType}: ${analysisResult.description}. ${analysisResult.recommendations.join(". ")}`;
+    onResultText?.(summaryText);
     await addHistory({ source: "environment", environmentData: form, result: analysisResult });
     setIsAnalyzing(false);
   };
