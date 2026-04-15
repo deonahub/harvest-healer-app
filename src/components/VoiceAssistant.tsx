@@ -125,7 +125,7 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
     [navigate, speak, lastResult, t]
   );
 
-  const startListening = useCallback(() => {
+  const startListening = useCallback(async () => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
@@ -133,6 +133,25 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
       toast({
         title: t("voice.notSupported"),
         description: t("voice.notSupportedDesc"),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Request microphone permission first to ensure the browser grants access
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+    } catch (err: any) {
+      console.error("Microphone permission error:", err);
+      toast({
+        title: t("voice.error"),
+        description:
+          err.name === "NotAllowedError"
+            ? "Microphone permission denied. Please allow microphone access in your browser settings."
+            : err.name === "NotFoundError"
+            ? "No microphone found on this device."
+            : err.message,
         variant: "destructive",
       });
       return;
@@ -164,7 +183,7 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
       setIsListening(false);
-      if (event.error !== "aborted") {
+      if (event.error !== "aborted" && event.error !== "not-allowed") {
         toast({
           title: t("voice.error"),
           description: event.error,
