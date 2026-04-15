@@ -50,7 +50,7 @@ const ImageUpload = ({ onResultText }: ImageUploadProps) => {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [t]);
+  }, [t, onResultText]);
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
