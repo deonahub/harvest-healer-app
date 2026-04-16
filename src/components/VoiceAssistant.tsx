@@ -166,6 +166,7 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
     recognition.lang = speechLangMap[language];
     recognition.continuous = false;
     recognition.interimResults = true;
+    console.log("[VoiceAssistant] Starting recognition with lang:", recognition.lang);
 
     recognition.onstart = () => setIsListening(true);
 
