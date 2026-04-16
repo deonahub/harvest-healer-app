@@ -143,10 +143,12 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
 
     // Request microphone permission first to ensure the browser grants access
     try {
+      console.log("[VoiceAssistant] Requesting microphone permission...");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((track) => track.stop());
+      console.log("[VoiceAssistant] Microphone permission granted");
     } catch (err: any) {
-      console.error("Microphone permission error:", err);
+      console.error("[VoiceAssistant] Microphone permission error:", err.name, err.message);
       toast({
         title: t("voice.error"),
         description:
