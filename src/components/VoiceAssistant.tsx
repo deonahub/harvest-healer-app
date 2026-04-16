@@ -126,8 +126,11 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
   );
 
   const startListening = useCallback(async () => {
+    console.log("[VoiceAssistant] startListening called");
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    console.log("[VoiceAssistant] SpeechRecognition available:", !!SpeechRecognition);
 
     if (!SpeechRecognition) {
       toast({
