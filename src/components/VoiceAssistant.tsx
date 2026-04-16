@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Mic, MicOff, Volume2, VolumeX, Upload, Clock, Search, CloudSun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage, type Language } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
@@ -209,8 +209,29 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
     };
   }, []);
 
+  const commandHints = [
+    { icon: Upload, label: t("voice.cmdUpload") },
+    { icon: Clock, label: t("voice.cmdHistory") },
+    { icon: Search, label: t("voice.cmdAnalyze") },
+    { icon: CloudSun, label: t("voice.cmdEnvironment") },
+  ];
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {isListening && (
+        <div className="bg-card border border-border rounded-2xl px-4 py-3 shadow-lg max-w-[220px] animate-slide-up">
+          <p className="text-xs font-semibold text-primary mb-2">{t("voice.cmdTitle")}</p>
+          <ul className="space-y-1.5">
+            {commandHints.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Icon className="size-3.5 text-primary/70 shrink-0" />
+                <span>{label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {transcript && (
         <div className="bg-card border border-border rounded-xl px-4 py-2 shadow-lg max-w-[250px] text-sm animate-slide-up">
           <p className="text-muted-foreground text-xs mb-1">{t("voice.heard")}</p>
