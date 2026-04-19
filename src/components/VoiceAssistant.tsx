@@ -223,7 +223,7 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3">
       {isListening && (
         <div className="bg-card border border-border rounded-2xl px-4 py-3 shadow-lg max-w-[220px] animate-slide-up">
           <p className="text-xs font-semibold text-primary mb-2">{t("voice.cmdTitle")}</p>
