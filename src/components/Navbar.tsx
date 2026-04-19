@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import LanguageSelector from "@/components/LanguageSelector";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const Navbar = () => {
   const { user, loading, signOut } = useAuth();
@@ -24,6 +25,7 @@ const Navbar = () => {
             <span className="hidden sm:inline">{t("nav.history")}</span>
           </Link>
           <LanguageSelector />
+          <ThemeToggle />
           {!loading && (
             user ? (
               <div className="flex items-center gap-2">
