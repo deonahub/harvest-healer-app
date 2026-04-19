@@ -262,7 +262,14 @@ const VoiceAssistant = ({ lastResult }: VoiceAssistantProps) => {
           variant={isListening ? "destructive" : "hero"}
           size="icon"
           className={`size-14 rounded-full shadow-lg ${isListening ? "animate-pulse" : ""}`}
-          onClick={isListening ? stopListening : startListening}
+          onClick={() => {
+            console.log("[VoiceAssistant] Mic button clicked, isListening:", isListening);
+            if (isListening) {
+              stopListening();
+            } else {
+              startListening();
+            }
+          }}
           title={isListening ? t("voice.stopListening") : t("voice.startListening")}
         >
           {isListening ? <MicOff className="size-6" /> : <Mic className="size-6" />}
