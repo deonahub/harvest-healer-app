@@ -105,8 +105,30 @@
     @apply border-border;
   }
 
+  html {
+    transition: background-color 400ms ease, color 400ms ease;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    transition: background-color 400ms ease, color 400ms ease;
+  }
+
+  body * {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 400ms;
+    transition-timing-function: ease;
+  }
+
+  /* Skip transitions on interactive states to keep them snappy */
+  button, a, input, textarea, select, [role="button"] {
+    transition-duration: 200ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html, body, body * {
+      transition: none !important;
+    }
   }
 }
 
