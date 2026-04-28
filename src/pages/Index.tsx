@@ -17,7 +17,6 @@ const Index = () => {
       <FeaturesSection />
       <ImageUpload onResultText={setLastResultText} />
       <EnvironmentalForm onResultText={setLastResultText} />
-      <VoiceAssistant lastResult={lastResultText} />
       <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
         <p>{t("footer.text")}</p>
       </footer>
