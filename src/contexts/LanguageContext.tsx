@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
-export type Language = "en" | "hi" | "kn" | "te" | "ta";
+export type Language = "en" | "hi" | "kn" | "te" | "ta" | "ml";
 
 export const languageNames: Record<Language, string> = {
   en: "English",
@@ -8,6 +8,7 @@ export const languageNames: Record<Language, string> = {
   kn: "ಕನ್ನಡ",
   te: "తెలుగు",
   ta: "தமிழ்",
+  ml: "മലയാളം",
 };
 
 const translations: Record<Language, Record<string, string>> = {
