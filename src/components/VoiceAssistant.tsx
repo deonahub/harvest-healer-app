@@ -11,6 +11,7 @@ const speechLangMap: Record<Language, string> = {
   kn: "kn-IN",
   te: "te-IN",
   ta: "ta-IN",
+  ml: "ml-IN",
 };
 
 // Command keywords per language
