@@ -11,6 +11,7 @@ const speechLangMap: Record<Language, string> = {
   kn: "kn-IN",
   te: "te-IN",
   ta: "ta-IN",
+  ml: "ml-IN",
 };
 
 // Command keywords per language
@@ -44,6 +45,12 @@ const commandMap: Record<Language, Record<string, string>> = {
     history: "வரலாறு|முந்தைய|பதிவுகள்",
     analyze: "பகுப்பாய்வு|ஸ்கேன்|சோதனை",
     environment: "சுற்றுச்சூழல்|தரவு|வானிலை",
+  },
+  ml: {
+    upload: "അപ്‌ലോഡ്|ഫോട്ടോ|ചിത്രം|ക്യാമറ",
+    history: "ചരിത്രം|മുമ്പത്തെ|റെക്കോർഡുകൾ",
+    analyze: "വിശകലനം|സ്കാൻ|പരിശോധിക്കുക",
+    environment: "പരിസ്ഥിതി|ഡാറ്റ|കാലാവസ്ഥ",
   },
 };
 
