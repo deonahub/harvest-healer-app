@@ -4,7 +4,6 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import ImageUpload from "@/components/ImageUpload";
 import EnvironmentalForm from "@/components/EnvironmentalForm";
-import VoiceAssistant from "@/components/VoiceAssistant";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
