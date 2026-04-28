@@ -162,6 +162,35 @@ const translations: Record<Language, Record<string, string>> = {
 
     // General
     "previous": "previous",
+
+    // Image Processing Pipeline
+    "pipeline.resize": "Resizing image...",
+    "pipeline.gray": "Converting to grayscale...",
+    "pipeline.denoise": "Reducing noise (Gaussian blur)...",
+    "pipeline.blurCheck": "Checking image sharpness...",
+    "pipeline.blurry": "Image is blurry, enhancing for better detection",
+    "pipeline.blurryDesc": "Applying sharpening and contrast enhancement.",
+    "pipeline.enhance": "Enhancing contrast (CLAHE) and sharpness...",
+    "pipeline.edges": "Detecting edges (Canny)...",
+    "pipeline.aiAnalyzing": "Running AI detection model...",
+    "pipeline.damage": "Highlighting damaged regions...",
+
+    // View modes
+    "view.original": "Original",
+    "view.enhanced": "Enhanced",
+    "view.edges": "Edges",
+    "view.damage": "Damage",
+    "view.heatmap": "Heatmap",
+
+    // Quality
+    "quality.clear": "Clear",
+    "quality.blurry": "Blurry",
+
+    // Diagnostics
+    "diag.quality": "Image Quality",
+    "diag.blurScore": "Sharpness Score",
+    "diag.regions": "Detected Regions",
+    "diag.damagePct": "Damage %",
   },
   hi: {
     "nav.upload": "अपलोड",
